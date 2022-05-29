@@ -8,7 +8,7 @@ pub fn run()
     let listener = TcpListener::bind("192.168.0.21:7878").unwrap();
 
     // if it's the first time booting up in a while
-    findnodes();
+    //findnodes();
     
     for stream in listener.incoming() {
         let stream = stream.unwrap();
@@ -37,17 +37,17 @@ fn handle_connection(mut stream: TcpStream) {
 
     // do if statements to see what the msg is and see what the network should do in response
     if msg.contains("new node") {
-        newnode(msg.trim_start_matches("new node : "), &stream);
-        stream.write(b"accepted").unwrap();
-        stream.flush().unwrap();
+        newnode(msg.trim_start_matches("new node : "), stream);
+        // stream.write(b"accepted").unwrap();
+        // stream.flush().unwrap();
     }
-    if msg.contains("node") {
+    if msg.contains("known node") {
         let mut nodesfile = File::options().append(true).open("nodes.txt").unwrap();
-        nodesfile.write_all(msg.trim_start_matches("node : ").as_bytes()).unwrap()
+        nodesfile.write_all(msg.trim_start_matches("known node : ").as_bytes()).unwrap()
     }
 } 
 
-fn newnode(msg: &str, mut stream: &TcpStream) {
+fn newnode(msg: &str, mut stream: TcpStream) {
     // check if node is already in file
     let nodesfile = File::open("nodes.txt").unwrap();
     let reader = BufReader::new(nodesfile);
@@ -60,11 +60,13 @@ fn newnode(msg: &str, mut stream: &TcpStream) {
             alreadyknown = true;
         } else {
             // send all known nodes
-            let node = format!("node : {}", line);
+            let node = format!("known node : {}", line);
             stream.write(node.as_bytes()).unwrap();
             stream.flush().unwrap();
         }
     }
+    stream.write("test".as_bytes()).unwrap();
+    stream.flush().unwrap();
 
     // if its not already in file add it
     if alreadyknown == false {
