@@ -1,0 +1,6 @@
+PPChain2.0 - previoushash - currentblockhash - time
+Num of transaction: 2
+bcbbd7a70fe1f5a74adec883e6b5677b017535e717dd346482b927075632adf4 -> ccb289086cb7e656e953a1fa8935743591f9237efb0b38336bf749c4b75d9e04 : 2.4PP
+6ad55329652759f7697b00eed1dc161db7c9810ad6f6b8e547115918f3bbb403 04f0b190b64839e4b36b722bc9a68b98e229cb540d6880d3ac7fc81e391c7979 : 8PP
+(This format is due to change)
+(this file will probably end up a csv file)
