@@ -4,7 +4,7 @@ use std::fs::File;
 use std::{thread, time::Duration};
 
 // only ran on first time startup
-pub fn find_nodes()
+pub fn node_bootstrap()
 {
     let mut stream = TcpStream::connect("192.168.0.105:7878").unwrap();
     stream.write(b"new node : 192.168.0.21:7878").unwrap();
@@ -17,11 +17,26 @@ pub fn find_nodes()
         let text = format!("{}{}", text.trim_end_matches("\0"), "\n");
 
         if text.trim() == "accepted" {
+            println!("breaking out of node bootstrap loop");
             break;
         }
 
         let mut nodes_file = File::options().append(true).open("nodes.txt").unwrap();
-        nodes_file.write_all(text.trim_start_matches("known node : ").as_bytes()).unwrap();
+        nodes_file.write_all(text.trim_start_matches("*node : ").as_bytes()).unwrap();
+    }
+
+    // loop through all nodes in nodes.txt and send '*node : local_ip' to them
+    let nodes_file = File::open("nodes.txt").unwrap();
+    let reader = BufReader::new(nodes_file);
+    for line in reader.lines() {
+        let line = line.unwrap();
+        let msg = format!("*node : {}", "local_ip");
+        println!("Sending: {} to {}", msg, line);
+
+        // commented out because there are no other nodes besides the two
+        // let mut stream = TcpStream::connect(line).unwrap();
+        // thread::sleep(Duration::from_millis(700));
+        // stream.write(msg.as_bytes()).unwrap();
     }
 }
 
@@ -37,7 +52,7 @@ pub fn new_node(msg: &str, mut stream: &TcpStream) {
             already_known = true;
         } else {
             // send all known nodes
-            let node = format!("known node : {}", line);
+            let node = format!("*node : {}", line);
             stream.write(node.as_bytes()).unwrap();
             stream.flush().unwrap();
             thread::sleep(Duration::from_millis(500));
