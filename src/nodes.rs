@@ -78,3 +78,14 @@ pub fn check_for_node(node: &str) -> bool {
     }
     false
 }
+
+pub fn return_nodes() -> Vec<String> {
+    let mut node_list = Vec::new();
+    let nodes_file = File::open("nodes.txt").unwrap();
+    let reader = BufReader::new(nodes_file);
+    for line in reader.lines() {
+        let line = line.unwrap();
+        node_list.push(line);
+    }
+    node_list
+}
