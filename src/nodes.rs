@@ -66,3 +66,15 @@ pub fn new_node(msg: &str, mut stream: &TcpStream) {
         nodes_file.write_all(msg.as_bytes()).unwrap()
     }
 }
+
+pub fn check_for_node(node: &str) -> bool {
+    let nodes_file = File::open("nodes.txt").unwrap();
+    let reader = BufReader::new(nodes_file);
+    for line in reader.lines() {
+        let line = line.unwrap();
+            if line == node {
+                return true;
+            }
+    }
+    false
+}

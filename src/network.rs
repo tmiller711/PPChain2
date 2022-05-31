@@ -2,7 +2,7 @@ use std::io::{prelude::*, BufReader};
 use std::net::{TcpListener, TcpStream};
 use std::fs::File;
 use std::{thread, time::Duration};
-use crate::nodes::{new_node, node_bootstrap};
+use crate::nodes::{new_node, node_bootstrap, check_for_node};
 
 // run name is due to change. Possibly make it main but IDK
 pub fn run()
@@ -40,8 +40,12 @@ fn handle_connection(mut stream: TcpStream) {
             break;
         }
         if msg.contains("*node") {
-            let mut nodes_file = File::options().append(true).open("nodes.txt").unwrap();
-            nodes_file.write_all(msg.trim_start_matches("*node : ").as_bytes()).unwrap();
+            let msg = msg.trim_start_matches("*node : ");
+            if !check_for_node(msg) {
+                let msg = format!("{}\n", msg);
+                let mut nodes_file = File::options().append(true).open("nodes.txt").unwrap();
+                nodes_file.write_all(msg.as_bytes()).unwrap();
+            }
             break;
         }
         if msg.contains("!DISCONNECT") {
