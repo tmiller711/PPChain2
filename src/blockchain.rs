@@ -6,9 +6,7 @@ use std::fs::File;
 use std::fs;
 use std::{thread, time::Duration};
 
-pub fn blockchain_startup() {
-    let nodes = return_nodes();
-    let mut stream = TcpStream::connect(&nodes[0]).unwrap();
+pub fn blockchain_startup(mut stream: TcpStream) {
     let blockheight = WalkDir::new("blocks").into_iter().count();
     let msg = format!("current height : {}", blockheight - 1);
 
@@ -42,7 +40,6 @@ pub fn blockchain_startup() {
             println!("{:?}", text);
         }
     }
-    
 }
 
 pub fn send_blocks(mut stream: TcpStream, start_block: i32) {
@@ -51,9 +48,10 @@ pub fn send_blocks(mut stream: TcpStream, start_block: i32) {
         let file = file.unwrap().path().display().to_string();
         let block_num = file.trim_start_matches("blocks\\").trim_end_matches(".txt").parse::<i32>().unwrap();
         
-        if block_num > start_block {
+        if block_num >= start_block {
             // send file name
             let block_id = format!("file name : {}.txt", block_num);
+            println!("Sending {:?}", block_id);
             stream.write(block_id.as_bytes()).unwrap();
             stream.flush().unwrap();
             thread::sleep(Duration::from_millis(500));

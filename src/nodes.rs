@@ -4,10 +4,9 @@ use std::fs::File;
 use std::{thread, time::Duration};
 
 // only ran on first time startup
-pub fn node_bootstrap()
+pub fn node_bootstrap(mut stream: TcpStream)
 {
-    let mut stream = TcpStream::connect("192.168.0.105:7878").unwrap();
-    stream.write(b"new node : 192.168.0.21:7878").unwrap();
+    stream.write(b"new node : 192.168.0.105:7878").unwrap();
     stream.flush().unwrap();
 
     loop {
